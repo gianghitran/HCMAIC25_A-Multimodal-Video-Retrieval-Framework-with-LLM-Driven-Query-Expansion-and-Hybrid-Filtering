@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Cache-Control" content="public, max-age=31536000" />
+  <meta name="theme-color" content="#3b82f6" />
+  <title>🌻 HelioSearch</title>
+  
+  <!-- Preload critical resources -->
+  <link rel="preload" href="style.css" as="style" />
+  <link rel="preload" href="script.js" as="script" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  
+  <!-- Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((registration) => {
+            console.log('✅ Service Worker registered:', registration.scope);
+          })
+          .catch((error) => {
+            console.log('❌ Service Worker registration failed:', error);
+          });
+      });
+    }
+  </script>
+</head>
+<body>
+  <!-- Image Zoom Modal - Enhanced -->
+  <div id="imageZoomModal" class="zoom-modal" style="display: none;">
+    <div class="zoom-modal-overlay"></div>
+    <button class="zoom-close" id="zoomClose">
+      <i class="fas fa-times"></i>
+    </button>
+    <button class="zoom-nav zoom-prev" id="zoomPrev" title="Frame trước (←)">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <button class="zoom-nav zoom-next" id="zoomNext" title="Frame sau (→)">
+      <i class="fas fa-chevron-right"></i>
+    </button>
+    <div class="zoom-content">
+      <!-- Center: Image -->
+      <div class="zoom-center">
+        <div class="zoom-image-wrapper">
+          <img id="zoomImg" src="" alt="Zoomed">
+          <button class="zoom-add-trake-btn" id="zoomAddTrakeBtn" title="Thêm vào TRAKE">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+        <div class="zoom-info">
+          <div class="zoom-frame-meta">
+            <p id="zoomFrameId" class="zoom-frame-id"></p>
+            <button id="zoomContextBtn" class="zoom-context-btn" title="Xem context">
+              <i class="fas fa-layer-group"></i>
+            </button>
+          </div>
+          <p id="zoomProgress" class="zoom-progress"></p>
+        </div>
+      </div>
+      
+      <!-- Right: Submit Controls -->
+      <div class="zoom-right-panel">
+        <h3 class="zoom-submit-header">SUBMIT</h3>
+        <div class="zoom-submit-controls">
+          <div class="submit-section">
+            <label style="font-size: 10px; font-weight: 600; color: var(--gray-600); margin-bottom: 0.35rem; display: block;">
+              <i class="fas fa-search"></i> KIS
+            </label>
+            <div class="submit-row">
+              <input type="text" id="zoomVideoId" placeholder="Video ID" readonly class="submit-input readonly" />
+              <input type="text" id="zoomFrameId2" placeholder="Frame ID" readonly class="submit-input readonly" />
+              <button type="button" id="zoomSubmitKis" class="btn-submit-zoom kis">
+                <i class="fas fa-upload"></i> Submit KIS
+              </button>
+            </div>
+          </div>
+          <div class="submit-section">
+            <label style="font-size: 10px; font-weight: 600; color: var(--gray-600); margin-bottom: 0.35rem; display: block;">
+              <i class="fas fa-question-circle"></i> QA
+            </label>
+            <div class="submit-row">
+              <input type="text" id="zoomAnswer" placeholder="Answer" class="submit-input" />
+              <button type="button" id="zoomSubmitQa" class="btn-submit-zoom qa">
+                <i class="fas fa-upload"></i> Submit QA
+              </button>
+            </div>
+          </div>
+          <div class="submit-section">
+            <label style="font-size: 10px; font-weight: 600; color: var(--gray-600); margin-bottom: 0.35rem; display: block;">
+              <i class="fas fa-list"></i> TRAKE
+            </label>
+            <div class="submit-row">
+              <input type="text" id="zoomTrakeIds" placeholder="Frame IDs (phân cách bằng dấu phẩy)" class="submit-input" />
+              <button type="button" id="zoomSubmitTrake" class="btn-submit-zoom trake">
+                <i class="fas fa-upload"></i> Submit TRAKE
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="nav-content">
+      <div class="nav-logo" id="navLogo">
+        <i class="fas fa-video" id="darkModeToggle"></i>
+        <h1 id="logoText">HelioSearch</h1>
+      </div>
+
+      <form id="searchForm" class="nav-search-form">
+        <input 
+          type="text" 
+          id="mainQuery" 
+          name="query" 
+          class="main-query-input"
+          placeholder="Main query..."
+        />
+
+        <input 
+          type="text" 
+          id="nextQueries" 
+          name="next_q" 
+          class="next-query-input"
+          placeholder="Next queries (phân tách bằng dấu phẩy)..."
+        />
+
+        <div class="expanded-toggle">
+          <label class="toggle-label">
+            <input type="checkbox" id="expandedPrompt" name="use_expanded_prompt" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <span class="toggle-text">Expanded</span>
+        </div>
+
+        <button type="submit" class="btn-search">
+          <i class="fas fa-search"></i>
+          <span>Tìm</span>
+        </button>
+
+        <input type="hidden" id="objectFilters" name="objects" value="">
+        <input type="hidden" id="topkInput" name="topk" value="50">
+      </form>
+
+      <div class="nav-right">
+        <span class="status-badge" id="statusBadge">
+          <i class="fas fa-circle"></i> Ready
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN LAYOUT -->
+  <div class="main-layout">
+    
+    <!-- LEFT SIDEBAR -->
+    <aside class="sidebar sidebar-left">
+      <div class="sidebar-section">
+        <h3><i class="fas fa-text-width"></i> OCR Text Search</h3>
+        <input 
+          type="text" 
+          id="ocrQuery" 
+          name="ocr_query" 
+          form="searchForm"
+          placeholder="Tìm text trong frame..."
+        />
+      </div>
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-volume-up"></i> Audio (ASR) Search</h3>
+        <input 
+          type="text" 
+          id="audioQuery" 
+          name="asr_query" 
+          form="searchForm"
+          placeholder="Tìm trong audio transcript..."
+        />
+      </div>
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-image"></i> Upload Image</h3>
+        <div class="upload-area" id="uploadArea">
+          <input 
+            type="file" 
+            id="uploadImage" 
+            name="image" 
+            form="searchForm"
+            accept=".jpg,.jpeg,.png"
+            hidden
+          />
+          <div class="upload-placeholder" id="uploadPlaceholder">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <p>Kéo thả hoặc click để chọn</p>
+          </div>
+          <div class="upload-preview" id="uploadPreview" style="display: none;">
+            <img id="previewImg" src="" alt="Preview">
+            <button type="button" class="remove-image" id="removeImage">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUERY REFINEMENT -->
+      <div class="sidebar-section query-refinement-section">
+        <h3><i class="fas fa-magic"></i> Query Refinement</h3>
+        <div class="refinement-container">
+          <textarea 
+            id="refineInput" 
+            placeholder="Nhập query..."
+            class="refine-textarea"
+            rows="2"
+          ></textarea>
+          <button type="button" id="refineBtn" class="btn-refine">
+            <i class="fas fa-wand-magic-sparkles"></i> Refine and Search
+          </button>
+          <div id="refineOutput" class="refine-output" style="display: none;">
+            <label>Refined Query:</label>
+            <div class="refined-text" id="refinedText"></div>
+            <button type="button" id="useQueryBtn" class="btn-use-query">
+              <i class="fas fa-arrow-right"></i> Use this query
+            </button>
+          </div>
+          <div id="refineLoading" class="refine-loading" style="display: none;">
+            <div class="spinner-small"></div>
+            <span>Refining...</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+      <div class="results-header">
+        <div class="results-info">
+          <i class="fas fa-images"></i>
+          <span id="resultCount">0 kết quả</span>
+        </div>
+        
+        <!-- Object Filter Inline -->
+        <div class="object-filter-inline">
+          <label class="toggle-label small">
+            <input type="checkbox" id="objectFilterToggle" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <div id="objectFilterContent" class="object-inline-content">
+            <input 
+              type="text" 
+              id="objectInput" 
+              placeholder="Filter objects..." 
+              autocomplete="off" 
+              class="object-inline-input"
+            />
+            <div class="object-dropdown" id="objectDropdown">
+              <div class="object-list" id="objectList"></div>
+            </div>
+            <div class="selected-tags" id="selectedTags"></div>
+          </div>
+        </div>
+        
+        <div class="results-controls">
+          <div class="topk-control">
+            <label>
+              <i class="fas fa-sliders-h"></i>
+              <strong id="topkValue">50</strong>
+            </label>
+            <input 
+              type="range" 
+              id="topkSlider" 
+              min="10" 
+              max="200" 
+              value="50" 
+              step="10"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-state" id="loadingState" style="display: none;">
+        <div class="spinner"></div>
+        <p>Đang tìm kiếm...</p>
+      </div>
+
+      <div class="empty-state" id="emptyState">
+        <i class="fas fa-search"></i>
+        <h3>Chưa có kết quả</h3>
+        <p>Nhập query và nhấn tìm kiếm để bắt đầu</p>
+      </div>
+
+      <div id="resultsGrid" class="results-grid"></div>
+    </main>
+
+    <!-- RIGHT SIDEBAR -->
+    <aside class="sidebar sidebar-right">
+      <div class="sidebar-section submit-header-section">
+        <h2 class="submit-header">SUBMIT</h2>
+      </div>
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-search"></i> KIS</h3>
+        <input type="text" id="kisVideoId" placeholder="Video ID" class="compact-input" />
+        <input type="text" id="kisFrameId" placeholder="Frame ID" class="compact-input" />
+        <button type="button" id="submitKisBtn" class="btn-submit-compact kis">
+          <i class="fas fa-upload"></i> Submit KIS
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-question-circle"></i> QA</h3>
+        <input type="text" id="qaVideoId" placeholder="Video ID" class="compact-input" />
+        <input type="text" id="qaFrameId" placeholder="Frame ID" class="compact-input" />
+        <input type="text" id="qaAnswer" placeholder="Answer" class="compact-input" />
+        <button type="button" id="submitQaBtn" class="btn-submit-compact qa">
+          <i class="fas fa-upload"></i> Submit QA
+        </button>
+      </div>
+
+      <div class="sidebar-section">
+        <h3><i class="fas fa-list"></i> TRAKE</h3>
+        <textarea 
+          id="trakeFrameIds" 
+          placeholder="L01_V001_00123,..."
+          class="compact-textarea"
+          rows="2"
+        ></textarea>
+        <button type="button" id="submitTrakeBtn" class="btn-submit-compact trake">
+          <i class="fas fa-upload"></i> Submit TRAKE
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
