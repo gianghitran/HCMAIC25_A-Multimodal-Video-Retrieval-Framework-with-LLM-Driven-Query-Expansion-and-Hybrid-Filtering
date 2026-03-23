@@ -1,7 +1,17 @@
 # HCMAIC25_A-Multimodal-Video-Retrieval-Framework-with-LLM-Driven-Query-Expansion-and-Hybrid-Filtering
 A high-performance Multimodal Video Retrieval framework featuring LLM-driven query expansion (Gemini/GPT) and hybrid vector-text filtering. Top 50 Finalist at HCMC AI Challenge 2025.
-Our [paper](paper_569.pdf) is accepted publication pending at Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)
+Our [paper](paper_569.pdf) is accepted, with publication pending in the Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)
 
+@inproceedings{vi2025heliosearch,
+  author       = {Chau The Vi, Nguyen The Luan, Tran Gia Nghi, Mai Nguyen Phuc Minh, Ngo Duc Hoang Son,Nguyen Huu Quyen and Phan The Duy},
+  title        = {{HelioSearch}: A Multimodal Video Retrieval Framework with {LLM}-Driven Query Expansion and Hybrid Filtering},
+  booktitle    = {Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)},
+  series       = {CCIS},
+  year         = {2025},
+  publisher    = {Springer},
+  address      = {Nha Trang, Vietnam},
+  date         = {12--14 December 2025}
+}
 # About 
 HCMAIC25: Multimodal Video Retrieval Framework LLM-Driven Query Expansion & Hybrid Filtering
 This repository contains the source code for our project in the [Ho Chi Minh AI Challenge 2025](https://aichallenge.hochiminhcity.gov.vn/) (Top 50 Finalist). We developed a unified framework for large-scale video event retrieval, inspired by international benchmarks like LSC and VBS.
