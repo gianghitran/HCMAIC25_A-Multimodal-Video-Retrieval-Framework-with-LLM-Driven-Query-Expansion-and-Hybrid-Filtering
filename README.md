@@ -8,7 +8,7 @@ This repository contains the source code for our project in the [Ho Chi Minh AI 
 
 ### Key Features
 - Multimodal Search: Seamlessly retrieves video segments using natural language queries (Text-to-Video).
-- LLM-Driven Expansion: Leverages Gemini/GPT-4o to refine, decompose, and expand Vietnamese queries into structured semantic units.
+- LLM-Driven Expansion: Leverages Gemini/GPT to refine, decompose, and expand Vietnamese queries into structured semantic units.
 - Hybrid Filtering: Combines semantic vector search (Milvus) with lexical metadata filtering (ElasticSearch) for maximum precision.
 - Advanced Extraction: Integrated pipeline using CLIP/BEiT-3 for visual embeddings, YOLOv12 for object detection, and ASR/OCR for temporal context.
 - Vietnamese-Centric: Optimized for native Vietnamese linguistic nuances and complex natural language understanding.
@@ -20,7 +20,7 @@ This repository contains the source code for our project in the [Ho Chi Minh AI 
 ### Citation
 ```bibtex
 @inproceedings{vi2025heliosearch,
-  author       = {Chau The Vi and Nguyen The Luan and Tran Gia Nghi and Mai Nguyen Phuc Minh and Ngo Duc Hoang Son and Nguyen Huu Quyen and Phan The Duy},
+  author       = {Chau The Vi, Nguyen The Luan, Tran Gia Nghi, Mai Nguyen Phuc Minh, Ngo Duc Hoang Son, Nguyen Huu Quyen and Phan The Duy},
   title        = {{HelioSearch}: A Multimodal Video Retrieval Framework with {LLM}-Driven Query Expansion and Hybrid Filtering},
   booktitle    = {Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)},
   series       = {CCIS},
