@@ -1,6 +1,6 @@
 # HCMAIC25_A-Multimodal-Video-Retrieval-Framework-with-LLM-Driven-Query-Expansion-and-Hybrid-Filtering
 A high-performance Multimodal Video Retrieval framework featuring LLM-driven query expansion (Gemini/GPT) and hybrid vector-text filtering. Top 50 Finalist at HCMC AI Challenge 2025.
-Our [paper](paper_569.pdf) is accepted, with publication pending in the Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)
+Our [paper](https://doi.org/10.1007/978-981-92-2584-2_11) is accepted, with publication pending in the Proceedings of the 14th International Symposium on Information and Communication Technology (SOICT 2025)
 
 # About 
 HCMAIC25: Multimodal Video Retrieval Framework LLM-Driven Query Expansion & Hybrid Filtering
